@@ -5,7 +5,7 @@
 
 ## Диаграмма системного контекста
 
-![context.png](context.png)
+![context.jpg](context.jpg)
 
 ## Диаграмма контейнеров
 
