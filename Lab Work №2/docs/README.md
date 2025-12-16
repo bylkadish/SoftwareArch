@@ -30,7 +30,7 @@
 8. IoT Gateway - связь с физическими устройствами;
 9. Databases - хранение данных.
 
-!
+![!container.png](!container.png)
 
 ## Диаграмма компонентов
 
