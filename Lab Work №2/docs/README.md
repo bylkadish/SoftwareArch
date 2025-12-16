@@ -38,4 +38,4 @@
 
 ## Доп. диаграмма компонентов
 
-![component2.png](!component2.png)
+![component2.png](component2.png)
