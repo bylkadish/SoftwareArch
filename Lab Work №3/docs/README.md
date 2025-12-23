@@ -15,3 +15,6 @@
 
 ![component2.png](component1.png)
 
+## Диаграмма последовательностей
+
+![posled.png](posled.png)
