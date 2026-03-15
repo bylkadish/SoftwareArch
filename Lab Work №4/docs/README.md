@@ -212,12 +212,12 @@ API представляет собой интерфейс для управле
 
   **Метод:** ```GET```
 
-  ![GETFirstTest.png](GETFirstTest.png)
+  ![GETFirstTest.PNG](GETFirstTest.PNG)
 
 
   **Автотесты:**
 
-  ![GETFirstAutoTests.png](GETFirstAutoTests.png)
+  ![GETFirstAutoTests.PNG](GETFirstAutoTests.PNG)
 
 ---
 
@@ -251,17 +251,17 @@ API представляет собой интерфейс для управле
 
   **Метод:** ```GET```
 
-  ![GETID.png](GETID.png)
+  ![GETID.PNG](GETID.PNG)
 
   **Тест 2:** <br>Получение несуществующего устройства
 
   **Метод:** ```GET```
 
-  ![GETIDW.png](GETIDW.png)
+  ![GETIDW.PNG](GETIDW.PNG)
 
-  **Автотесты: **
+  **Автотесты:**
 
-  ![GETIDAuto.png](GETIDAuto.png)
+  ![GETIDAuto.PNG](GETIDAuto.PNG)
 
 ---
 
@@ -296,11 +296,11 @@ API представляет собой интерфейс для управле
 
   **Тест:** <br>Создание нового устройства
 
-  ![POSTNEW.png](POSTNEW.png)
+  ![POSTNEW.PNG](POSTNEW.PNG)
 
-  **Автотесты: **
+  **Автотесты:**
 
-  ![POSTAuto.png](POSTAuto.png)
+  ![POSTAuto.PNG](POSTAuto.PNG)
 
 ---
 
@@ -325,15 +325,15 @@ API представляет собой интерфейс для управле
 
   **Тест 1:** <br>Обновление существующего устройства
 
-  ![PUT.png](PUT.png)
+  ![PUT.PNG](PUT.PNG)
 
   **Тест 2:** <br>Обновление несуществующего устройства
 
-  ![PUTW.png](PUTW.png)
+  ![PUTW.PNG](PUTW.PNG)
 
-  **Автотесты: **
+  **Автотесты:**
 
-  ![PUTAuto.png](PUTAuto.png)
+  ![PUTAuto.PNG](PUTAuto.PNG)
 
 ---
 
@@ -351,15 +351,15 @@ API представляет собой интерфейс для управле
 
   **Тест 1:** <br>Удаление устройства
 
-  ![DELDev.png](DELDev.png)
+  ![DELDev.PNG](DELDev.PNG)
 
   **Тест 2:** <br>Удаление несуществующего устройства
 
-  ![DELDevW.png](DELDevW.png)
+  ![DELDevW.PNG](DELDevW.PNG)
 
-  **Автотесты: **
+  **Автотесты:**
 
-  ![DELAuto.png](DELAuto.png)
+  ![DELAuto.PNG](DELAuto.PNG)
 
 ---
 
@@ -390,11 +390,11 @@ API представляет собой интерфейс для управле
 
   **Тест:** <br>Получение списка сценариев
 
-  ![GETScen.png](GETScen.png)
+  ![GETScen.PNG](GETScen.PNG)
 
-  **Автотесты: **
+  **Автотесты:**
 
-  ![GETScenAuto.png](GETScenAuto.png)
+  ![GETScenAuto.PNG](GETScenAuto.PNG)
 
 ---
 
@@ -418,11 +418,11 @@ API представляет собой интерфейс для управле
 
   **Тест:** <br>Создание сценария
 
-  ![POSTScen.png](POSTScen.png)
+  ![POSTScen.PNG](POSTScen.PNG)
 
-  **Автотесты: **
+  **Автотесты:**
 
-  ![POSTScenAuto.png](POSTScenAuto.png)
+  ![POSTScenAuto.PNG](POSTScenAuto.PNG)
 
 ---
 
@@ -451,8 +451,8 @@ API представляет собой интерфейс для управле
 
   **Тест:** <br>Получение уведомлений
 
-  ![GETNot.png](GETNot.png)
+  ![GETNot.PNG](GETNot.PNG)
 
-  **Автотесты: **
+  **Автотесты:**
 
-  ![GETNotAuto.png](GETNotAuto.png)
+  ![GETNotAuto.PNG](GETNotAuto.PNG)
