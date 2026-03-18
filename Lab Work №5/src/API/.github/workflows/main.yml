@@ -23,3 +23,21 @@ jobs:
 
       - name: Run tests
         run: docker run --rm bablobudget-tests
+        
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build backend image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/bablobudget-api ./API
+
+      - name: Push backend image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/bablobudget-api
+
+      - name: Build frontend image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/bablobudget-client ./Client
+
+      - name: Push frontend image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/bablobudget-client
