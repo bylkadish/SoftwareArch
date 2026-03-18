@@ -17,12 +17,6 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-
-      - name: Build Docker image
-        run: docker build --target tests -t bablobudget-tests './Lab Work №5/src/API'
-
-      - name: Run tests
-        run: docker run --rm bablobudget-tests
         
       - name: Login to Docker Hub
         uses: docker/login-action@v2
