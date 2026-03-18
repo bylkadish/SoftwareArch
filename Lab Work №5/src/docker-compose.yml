@@ -1,0 +1,50 @@
+services:
+  bablobudget-services:
+    build:
+      context: ./API
+      dockerfile: Dockerfile
+      target: services
+    ports:
+      - "8018:8018"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Host=db;Database=${POSTGRES_DB};Username=postgres;Password=${POSTGRES_PASSWORD};"
+    depends_on:
+      - db
+    networks:
+      - bablobudgetnetwork
+
+  bablobudget-client:
+    build:
+      context: ./Client
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./Client:/app
+      - /app/node_modules
+    networks:
+      - bablobudgetnetwork
+    depends_on:
+      - bablobudget-services
+
+  db:
+    image: postgres:17
+    container_name: bablobudgetdb2
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    networks:
+      - bablobudgetnetwork
+    volumes:
+      - database:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+volumes:
+  database:
+
+networks:
+  bablobudgetnetwork:
+    driver: bridge
