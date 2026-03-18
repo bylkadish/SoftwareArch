@@ -19,7 +19,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Build Docker image
-        run: docker build --target tests -t bablobudget-tests ./src/API
+        run: docker build --target tests -t bablobudget-tests ./Lab Work №5/src/API
 
       - name: Run tests
         run: docker run --rm bablobudget-tests
