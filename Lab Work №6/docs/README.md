@@ -1864,7 +1864,7 @@ public sealed class AutomationScenario
 
 ---
 
-**1. Creator**
+**2. Creator**
 
 **Проблема:** </br> Кто должен создавать конкретные объекты устройств?
 
@@ -1890,3 +1890,298 @@ public sealed class WifiDeviceFactory : IDeviceFamilyFactory
   - Напрямую связан с Abstract Factory и Factory Method.
 
 ---
+
+**3. Controller**
+
+**Проблема:** </br> Кто должен принимать системные запросы от внешнего уровня и координировать выполнение бизнес-операций?
+
+**Решение:** </br> Эта обязанность возлагается на SmartHomeFacade или контроллер API, который принимает пользовательский запрос и вызывает нужные подсистемы.
+
+**Пример фрагмента кода:**
+```csharp
+public sealed class SmartHomeFacade
+{
+    private readonly AuthServiceClient _auth;
+    private readonly DeviceManagementClient _devices;
+    private readonly AutomationServiceClient _automation;
+    private readonly NotificationServiceClient _notifications;
+
+    public async Task ActivateAwayModeAsync(string userId)
+    {
+        if (!await _auth.ValidateSessionAsync(userId))
+            throw new UnauthorizedAccessException("Invalid session");
+
+        await _devices.SetHomeModeAsync(userId, "Away");
+        await _automation.ActivateScenarioGroupAsync(userId, "AwayMode");
+        await _notifications.SendSystemMessageAsync(userId, "Режим активирован.");
+    }
+}
+```
+
+**Результаты:**
+  - UI не содержит бизнес-логики;
+  - упрощается распределение ответственности;
+  - код становится чище и тестируемее.
+
+**Связь с другими паттернами:**
+  - Связан с Facade и Chain of Responsibility.
+
+---
+
+**4. Pure Fabrication**
+
+**Проблема:** </br> Если логика интеграции, логирования, доступа к данным и транспорта будет располагаться в доменных сущностях, то они станут перегруженными.
+
+**Решение:** </br> Создаются специальные сервисные классы, не являющиеся доменными объектами, например:
+  - AuditService;
+  - AuthorizationService;
+  - NotificationService;
+  - DeviceExecutionService.
+
+**Пример фрагмента кода:**
+```csharp
+public sealed class AuditService
+{
+    public Task WriteAsync(string message)
+    {
+        Console.WriteLine("[AUDIT] " + message);
+        return Task.CompletedTask;
+    }
+}
+```
+
+**Результаты:**
+  - доменные классы остаются компактными;
+  - уменьшается связность;
+  - повышается повторное использование инфраструктурного кода.
+
+**Связь с другими паттернами:**
+  - Связан с Proxy, Facade, Observer.
+
+---
+
+**5. Polymorphism**
+
+**Проблема:** </br> Как обрабатывать разные типы устройств и разные способы поведения без множества if/switch?
+
+**Решение:** </br> Использовать полиморфные интерфейсы: IDeviceCommand, IManagedDevice, IDoorLockState, ICommandConflictResolutionStrategy.
+
+**Пример фрагмента кода:**
+```csharp
+public interface IDeviceCommand
+{
+    string DeviceId { get; }
+    Task ExecuteAsync();
+}
+
+public sealed class LockDoorCommand : IDeviceCommand
+{
+    public string DeviceId { get; }
+
+    public LockDoorCommand(string deviceId)
+    {
+        DeviceId = deviceId;
+    }
+
+    public Task ExecuteAsync()
+    {
+        Console.WriteLine($"Lock command executed for {DeviceId}");
+        return Task.CompletedTask;
+    }
+}
+```
+
+**Результаты:**
+  - меньше условных операторов;
+  - легче добавлять новые типы поведения;
+  - система становится расширяемой.
+
+**Связь с другими паттернами:**
+  - Связан с Command, State, Strategy, Adapter.
+
+---
+
+### Принципы разработки
+
+---
+
+**1. Low Coupling**
+
+**Проблема:** </br> Если сервисы и классы будут жёстко связаны с конкретными реализациями устройств, каналов уведомлений и видеосервисов, то любые изменения приведут к каскадной переработке системы.
+
+**Решение:** </br> Использовать интерфейсы и абстракции:
+  - IDeviceFamilyFactory;
+  - INotificationSender;
+  - ICameraStreamService;
+  - ICommandConflictResolutionStrategy.
+
+**Пример фрагмента кода:**
+```csharp
+public sealed class NotificationService
+{
+    private readonly NotificationSenderCreator _creator;
+
+    public NotificationService(NotificationSenderCreator creator)
+    {
+        _creator = creator;
+    }
+
+    public Task NotifySecurityEventAsync(string userId, string text, NotificationChannel channel)
+    {
+        var message = new NotificationMessage
+        {
+            UserId = userId,
+            Title = "Security event",
+            Text = text,
+            Channel = channel
+        };
+
+        return _creator.SendToUserAsync(message);
+    }
+}
+```
+
+**Результаты:**
+  - проще заменять реализации;
+  - легче тестировать;
+  - изменения локализуются.
+
+**Связь с другими паттернами:**
+  - Связан с Adapter, Strategy, Factory Method, Observer.
+
+---
+
+**2. High Cohesion**
+
+**Проблема:** </br> Если в одном классе смешать управление устройствами, аутентификацию, видео, автоматизацию и уведомления, код станет трудно поддерживать.
+
+**Решение:** </br> Разделить обязанности по сервисам и классам с чёткой специализацией:
+  - SmartHomeFacade — координация;
+  - AutomationScenario — логика сценария;
+  - SecureCameraStreamProxy — контроль доступа к видео;
+  - CommandInvoker — выполнение команд.
+
+**Пример фрагмента кода:**
+```csharp
+public sealed class CommandInvoker
+{
+    private readonly Queue<IDeviceCommand> _queue = new();
+
+    public void Enqueue(IDeviceCommand command) => _queue.Enqueue(command);
+
+    public async Task ExecuteAllAsync()
+    {
+        while (_queue.Count > 0)
+        {
+            var command = _queue.Dequeue();
+            await command.ExecuteAsync();
+        }
+    }
+}
+```
+
+**Результаты:**
+  - классы проще понимать;
+  - легче вносить изменения;
+  - тесты становятся более точечными.
+
+**Связь с другими паттернами:**
+  - Связан с Command, Facade, State, Builder.
+
+---
+
+**3. Indirection**
+
+**Проблема:** </br> Клиентскому приложению и бизнес-логике не следует напрямую зависеть от всех конкретных внешних подсистем.
+
+**Решение:** </br> Вводится промежуточный слой:
+  - SmartHomeFacade между клиентом и сервисами;
+  - DeviceEventPublisher между источником событий и подписчиками;
+  - SecureCameraStreamProxy между пользователем и видеосервисом.
+
+**Пример фрагмента кода:**
+```csharp
+public sealed class DeviceEventPublisher
+{
+    private readonly List<IEventSubscriber> _subscribers = new();
+
+    public void Subscribe(IEventSubscriber subscriber) => _subscribers.Add(subscriber);
+
+    public async Task PublishAsync(DeviceEvent deviceEvent)
+    {
+        foreach (var subscriber in _subscribers)
+            await subscriber.HandleAsync(deviceEvent);
+    }
+}
+```
+
+**Результаты:**
+  - снижение прямой связанности;
+  - более гибкая архитектура;
+  - проще менять и расширять систему.
+
+**Связь с другими паттернами:**
+  - Связан с Observer, Facade, Proxy, Chain of Responsibility.
+
+---
+
+### Свойство программы (цель)
+
+---
+
+**1. Protected Variations**
+
+**Проблема:** </br> Система умного дома подвержена постоянным изменениям:
+  - новые производители устройств;
+  - новые протоколы;
+  - новые типы сценариев;
+  - новые каналы уведомлений;
+  - новые политики безопасности.
+</br> Если архитектура не защищена от таких изменений, то при каждом расширении придётся переписывать существующий код.
+
+**Решение:** </br> Строить систему вокруг стабильных абстракций и точек расширения:
+  - интерфейсы устройств;
+  - фабрики семейств устройств;
+  - адаптеры для SDK;
+  - стратегии выбора поведения;
+  - цепочка обработчиков для проверок.
+
+**Пример фрагмента кода:**
+```csharp
+public interface IManagedDevice
+{
+    string DeviceId { get; }
+    Task ExecuteAsync(string command);
+    Task<string> ReadStateAsync();
+}
+
+public sealed class VendorLightAdapter : IManagedDevice
+{
+    private readonly VendorLightSdk _sdk;
+    public string DeviceId { get; }
+
+    public VendorLightAdapter(string deviceId, VendorLightSdk sdk)
+    {
+        DeviceId = deviceId;
+        _sdk = sdk;
+    }
+
+    public async Task ExecuteAsync(string command)
+    {
+        if (command == "on")
+            await _sdk.PowerAsync(DeviceId, true);
+        else if (command == "off")
+            await _sdk.PowerAsync(DeviceId, false);
+    }
+
+    public Task<string> ReadStateAsync() => _sdk.GetStatusAsync(DeviceId);
+}
+```
+
+**Результаты:**
+  - добавление нового устройства не ломает систему;
+  - изменения локализуются в адаптере или конкретной реализации;
+  - архитектура лучше выдерживает рост бизнеса и продуктовые изменения.
+
+**Связь с другими паттернами:**
+  - Связан с Observer, Facade, Proxy, Chain of Responsibility.
